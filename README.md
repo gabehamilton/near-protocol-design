@@ -21,6 +21,7 @@ This repo holds **no implementation code**.
 | WS2 | [`docs/where-ml-dsa-enters.md`](docs/where-ml-dsa-enters.md) | Surface map: every point an ML-DSA key/signature enters the protocol — access keys, transactions, delegate actions, validator approvals, light clients — with producer/verifier/byte-location/critical-path per surface. |
 | WS2 | [`docs/size-impact-analysis.md`](docs/size-impact-analysis.md) | The sharp edge, quantified: state size, approval bandwidth (~50× at full validator migration), light-client cost, and the gas/fee ripple points (noted, not repriced). |
 | WS3 | [`spec/MLDSAAcceptance.tla`](spec/MLDSAAcceptance.tla) (+ 4 `.cfg`, [`spec/README.md`](spec/README.md)) | TLC-checked model of the acceptance path: crypto as an oracle predicate, Byzantine signer, divergent-verifier hypothesis. Proves **non-divergence** and **accountable equivocation** hold under the conformance rule — and exhibits the silent-divergence and unaccountable light-client-split attacks when it is dropped. |
+| sim | [`sim/near_pq_sim.py`](sim/near_pq_sim.py) ([`results.md`](sim/results.md)) | 250-node / 8-shard network simulation quantifying PQ performance and economic impact across adoption scenarios: block time, capacity by binding constraint, bandwidth/archival growth, fees/burn, validator and archival-operator economics. |
 
 ## The one-paragraph result
 
