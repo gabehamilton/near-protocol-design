@@ -40,9 +40,14 @@ same on-trie footprint as ed25519. The full key exists only on the wire.
 
 - **Produces:** the account owner signs the `AddKey`-carrying transaction;
   the action body carries the full 1953 B pubkey.
-- **Verifies:** the runtime's action validation (`validate_add_key_action`),
-  gated by the protocol feature. No signature by the *new* key is verified
-  at registration — only the registering transaction's signature.
+- **Verifies:** the runtime's action validation, gated by a **centralized**
+  post-quantum gate (`validate_actions_with_mode` in
+  `runtime/runtime/src/action_validation.rs`, driven by an exhaustive
+  `Action::post_quantum_signatures_required` match). Centralization is
+  load-bearing: actions emitted *by contracts* via host functions become
+  receipts that never pass transaction admission, so a per-call-site gate
+  would miss that third entry path. No signature by the *new* key is
+  verified at registration — only the registering transaction's signature.
 - **Bytes:** wire + receipt only (a delayed receipt holds the 1953 B action
   in state transiently until applied); trie holds 33 B forever.
 - **Consequences of the hash split:**
@@ -88,9 +93,12 @@ material.
 - **Produces:** the end user signs the inner `DelegateAction`; the relayer
   signs the enclosing transaction.
 - **Verifies:** the runtime verifies the inner signature at receipt
-  processing (`validate_delegate_action`), gated; the outer signature is
-  surface 2. The inner verification is charged to the transaction's burnt
-  gas exactly like an outer signature (WS1 §6).
+  processing (`apply_delegate_action`); admission is gated by the same
+  centralized action gate as surface 1, whose
+  `post_quantum_signatures_required` match recurses into `Delegate` inner
+  actions. The outer signature is surface 2. The inner verification is
+  charged to the transaction's burnt gas exactly like an outer signature
+  (WS1 §6).
 - **Divergence note:** the inner signature is verified by the runtime *on
   chain*, so it is consensus-critical in the same way as surface 2 —
   acceptance-rule conformance applies identically to the nested case.
