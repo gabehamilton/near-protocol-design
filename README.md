@@ -16,7 +16,7 @@ This repo holds **no implementation code**.
 > **📊 [Simulation findings](sim/findings.md)** — performance & economic impact
 > of the PQ change on a 250-node / 8-shard network: user-side PQ is
 > latency-neutral but grows archival storage 17×; validator-key PQ stretches
-> block time +3.4%; payments-mix capacity drops 77%; the unpriced transaction
+> block time ~7%; payments-mix capacity drops 77%; the unpriced transaction
 > byte axis (~21×) is the real subsidy, and archival operators bear the
 > largest unfunded cost.
 

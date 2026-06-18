@@ -200,17 +200,22 @@ def simulate(p: Params, sc: Scenario, blocks: int, seed: int) -> dict:
     approval_payload = p.approvers * APPROVAL_SLOT[vscheme]  # header approvals bytes
     endorse_payload = n_endorse * APPROVAL_SLOT[vscheme]     # block-body endorsements
 
+    last_block_time_ms = p.block_time_ms
     for b in range(blocks):
         # -- demand arrives (Poisson per block, split uniformly over shards) --
-        lam = p.offered_tps * p.block_time_ms / 1000.0
+        # Arrivals scale with the ACTUAL duration of the previous block, not
+        # the 600 ms target: when blocks stretch under congestion, real-time tx
+        # arrivals keep coming, so more accumulate per (longer) block. Using the
+        # constant target here would understate backlog exactly when it matters.
+        lam = p.offered_tps * last_block_time_ms / 1000.0
         # Poisson via normal approximation (lam ~ 1200; fine and fast).
-        n_arrivals = max(0, int(rng.gauss(lam, math.sqrt(lam)) + 0.5))
+        n_arrivals = max(0, int(rng.gauss(lam, math.sqrt(lam)) + 0.5)) if lam > 0 else 0
         for _ in range(n_arrivals):
             queues[rng.randrange(p.shards)].append(make_tx(rng, p, sc, b))
 
         # -- chunk production per shard --------------------------------------
         included, pq_included, tx_bytes_total, gas_total = [], 0, 0, 0.0
-        witness_bytes, bounds = [], []
+        witness_bytes, bounds, shard_txs = [], [], []
         for s in range(p.shards):
             txs, tb, gas, wit, bound = fill_chunk(queues[s], p, b)
             included.extend(txs)
@@ -219,20 +224,29 @@ def simulate(p: Params, sc: Scenario, blocks: int, seed: int) -> dict:
             gas_total += gas
             witness_bytes.append(wit)
             bounds.append(bound)
+            shard_txs.append(txs)
 
         # -- critical path ----------------------------------------------------
-        # Chunk side: witness distribution (parts model: ~2 link traversals of
-        # the full witness; nearcore distributes erasure-coded parts which
-        # validators re-forward) + chunk-validator verification of the txs in
-        # the witness + endorsement back to the producer.
-        worst_wit = max(witness_bytes)
-        worst_shard = witness_bytes.index(worst_wit)
-        per_shard_tx = len(included) / p.shards if p.shards else 0
-        mixed_verify_us = sc.user_pq * MLDSA65.verify_us + (1 - sc.user_pq) * ED25519.verify_us
-        cv_verify_ms = per_shard_tx * mixed_verify_us / p.cores_for_crypto / 1000.0
-        t_chunk = (latency_ms(rng, p) + 2 * send_ms(worst_wit, p)      # witness out
-                   + cv_verify_ms + vscheme.sign_us / 1000.0
-                   + latency_ms(rng, p) + send_ms(APPROVAL_SLOT[vscheme], p))  # endorse back
+        # Chunk side, computed PER SHARD: the block waits on the slowest chunk,
+        # so each shard's witness distribution (parts model: ~2 link traversals
+        # of the full witness; nearcore distributes erasure-coded parts which
+        # validators re-forward) + chunk-validator verification of THAT shard's
+        # own txs + endorsement back to the producer is computed independently,
+        # then the max is taken. Verifying the bottleneck shard's actual tx
+        # count (not the cross-shard average) keeps verify latency honest under
+        # non-uniform Poisson load, where the fullest shard has both the largest
+        # witness and the most signatures to check.
+        t_chunks = []
+        for s in range(p.shards):
+            pq_count = sum(1 for t in shard_txs[s] if t.pq)
+            classical_count = len(shard_txs[s]) - pq_count
+            verify_us = pq_count * MLDSA65.verify_us + classical_count * ED25519.verify_us
+            cv_verify_ms = verify_us / p.cores_for_crypto / 1000.0
+            t_chunks.append(latency_ms(rng, p) + 2 * send_ms(witness_bytes[s], p)  # witness out
+                            + cv_verify_ms + vscheme.sign_us / 1000.0
+                            + latency_ms(rng, p) + send_ms(APPROVAL_SLOT[vscheme], p))  # endorse back
+        t_chunk = max(t_chunks) if t_chunks else 0.0
+        worst_shard = t_chunks.index(t_chunk) if t_chunks else 0
 
         # Approval side: every approver signs and sends to the next producer;
         # the producer ingests and verifies all of them.
@@ -266,6 +280,7 @@ def simulate(p: Params, sc: Scenario, blocks: int, seed: int) -> dict:
             inclusion_delay_blocks=statistics.fmean(delays) if delays else 0.0,
             bound=bounds[worst_shard],
         ))
+        last_block_time_ms = block_time
 
     return aggregate(p, sc, stats, vscheme)
 

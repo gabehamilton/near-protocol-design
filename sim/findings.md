@@ -19,8 +19,8 @@ The cost lands entirely on bytes at rest and in flight:
 
 | user PQ | block time | archival growth | node egress |
 |---|---|---|---|
-| 0% | 600.1 ms | 54 GB/day | 17.9 GB/day |
-| 100% | 600.2 ms | 946 GB/day (**17×**) | 42.8 GB/day (**2.4×**) |
+| 0% | 601.2 ms | 54.2 GB/day | 17.8 GB/day |
+| 100% | 600.9 ms | 947 GB/day (**17×**) | 42.8 GB/day (**2.4×**) |
 
 **Implication:** PQ adoption by users is safe for consensus latency. Plan for
 it as a disk-and-bandwidth growth curve, not a throughput regression.
@@ -31,15 +31,19 @@ Moving validator approval/endorsement keys to ML-DSA is the one change that
 touches the hot path. Approval payload grows **16.5 KB → 827.8 KB per block**
 (250 approvers × 3311 B), blocks reach ~1.6 MB:
 
-| | block time avg/p99 | throughput | node egress |
-|---|---|---|---|
-| classical validators | 600.1 / 600.0 ms | 1999.7 tps | 17.9 GB/day |
-| PQ validators | 620.3 / 811.3 ms (+3.4% / +35%) | 1934.5 tps (−3%) | 239.6 GB/day (**13×**) |
+| | block time avg/p99 | throughput | inclusion delay | node egress |
+|---|---|---|---|---|
+| classical validators | 601.2 / 600.0 ms | 1998.7 tps | 0.01 blk | 17.8 GB/day |
+| PQ validators | 643.6 / 854.3 ms (+7% / +42%) | ~offered (2001.7 tps) | 0.2 blk | 231.0 GB/day (**13×**) |
 
-That ~25 Mbit/s-per-node of pure consensus traffic would be ~37% higher
-still if approvals carried public keys. They don't: the surface-4 design
-keeps validator pubkeys in epoch state and puts only signatures on the wire.
-**The single most important performance lever is already pulled.**
+Throughput holds at the offered load — the stretch shows up as latency, not
+dropped transactions — but the consensus path now carries ~21 Mbit/s-per-node
+of pure approval/endorsement traffic, and once the full-PQ case is pushed it
+begins to queue (16.8-block inclusion delay at 2000 tps offered). That egress
+would be ~37% higher still if approvals carried public keys. They don't: the
+surface-4 design keeps validator pubkeys in epoch state and puts only
+signatures on the wire. **The single most important performance lever is
+already pulled.**
 
 ## 3. Capacity loss depends entirely on the traffic mix
 
@@ -51,9 +55,11 @@ Whether PQ costs throughput is decided by what binds the chunk:
 | payments (~0.5 Tgas) | 22,274 tps | 5,132 tps | **−77%** | flips gas → **tx-bytes** |
 
 The stress run makes it concrete: classical clears 6000 tps of payments with
-zero queueing; 100% PQ saturates at ~5,120 tps with an unbounded, growing
-backlog. **Gas-heavy chains barely notice; payment rails are byte-bound and
-lose three-quarters of their headroom.**
+zero queueing; 100% PQ saturates at ~5,100 tps with an unbounded, growing
+backlog (149-block inclusion delay and climbing), and full PQ falls to
+~4,300 tps with a 280-block backlog as block-time stretch compounds the
+arrival rate. **Gas-heavy chains barely notice; payment rails are byte-bound
+and lose three-quarters of their headroom.**
 
 ## 4. Direct fees are negligible; the unpriced byte axis is the real subsidy
 
@@ -72,8 +78,8 @@ The byte axis is unpriced.
 
 | party | extra cost at full PQ | context |
 |---|---|---|
-| validator (egress) | ~$360/mo | ~0.8% of avg per-node reward (~$47k/mo) — absorbable |
-| archival operator (storage) | +$615–730/mo | **earns no protocol rewards** |
+| validator (egress) | ~$320–345/mo | ~0.7% of avg per-node reward (~$47k/mo) — absorbable |
+| archival operator (storage) | +$616–748/mo | **earns no protocol rewards** |
 | user (state staking) | $0 | hash-on-trie split keeps ML-DSA keys at ed25519 cost |
 
 **Implication:** the strongest economic argument for the approval-pruning /
@@ -88,7 +94,7 @@ economics, not validator economics.
 | if you are deciding… | the simulation says… |
 |---|---|
 | let users adopt PQ keys | safe now — latency-neutral; budget for 17× archival growth |
-| migrate validator keys to PQ | feasible (+3.4% block time) **because** approvals are signature-only; revisit if p99 latency tightens |
+| migrate validator keys to PQ | feasible (+7% block time) **because** approvals are signature-only; revisit if p99 latency tightens |
 | run a payments-heavy chain on PQ | raise byte budgets or expect a 77% capacity cut |
 | price the change | ship per-byte tx pricing first; the verify surcharge alone under-charges PQ by ~21× on bytes |
 | fund the costs | archival operators, not validators, are the strained party |
