@@ -1,0 +1,320 @@
+{
+  "params": {
+    "nodes": 250,
+    "shards": 8,
+    "block_producers": 100,
+    "approvers": 250,
+    "chunk_validators_per_shard": 30,
+    "gossip_fanout": 8,
+    "cores_for_crypto": 8,
+    "block_time_ms": 600.0,
+    "latency_median_ms": 40.0,
+    "latency_sigma": 0.5,
+    "bandwidth_bps": 1000000000.0,
+    "chunk_gas_limit_tgas": 1000.0,
+    "chunk_tx_bytes_limit": 2097152,
+    "witness_soft_limit": 8388608,
+    "offered_tps": 2000.0,
+    "tx_body_mean_b": 250.0,
+    "tx_body_sigma": 0.5,
+    "tx_gas_mean_tgas": 5.0,
+    "tx_gas_sigma": 0.6,
+    "witness_fixed_b": 1200000.0,
+    "witness_per_tx_factor": 1.5,
+    "gas_price_near_per_tgas": 0.0001,
+    "pq_surcharge_tgas": 0.1,
+    "near_usd": 2.5,
+    "egress_usd_per_gb": 0.05,
+    "storage_usd_per_gb_month": 0.023,
+    "total_staked_near": 590000000.0,
+    "annual_inflation": 0.05,
+    "validator_reward_share": 0.9,
+    "total_supply_near": 1260000000.0
+  },
+  "results": [
+    {
+      "scenario": "baseline (all classical)",
+      "user_pq": 0.0,
+      "validator_pq": false,
+      "perf": {
+        "avg_block_time_ms": 601.2,
+        "p99_block_time_ms": 600.0,
+        "blocks_stretched_pct": 1.0,
+        "throughput_tps": 1998.7,
+        "avg_inclusion_delay_blocks": 0.01,
+        "end_backlog_txs": 4,
+        "binding_constraint": "demand",
+        "bp_sig_verify_ms_per_block": 1.96
+      },
+      "bytes": {
+        "approvals_per_block_kb": 16.5,
+        "endorsements_per_block_kb": 15.8,
+        "block_kb": 37.5,
+        "avg_tx_bytes_per_block_kb": 339.7,
+        "avg_witness_per_block_kb": 10449.1,
+        "witness_p99_per_shard_mb": 1.33,
+        "node_egress_gb_day": 17.82,
+        "bp_burst_mb_per_block": 0.33,
+        "archive_growth_gb_day": 54.2,
+        "epoch_state_added_kb": 0.0
+      },
+      "econ": {
+        "pq_surcharge_burn_near_day": 0.0,
+        "user_extra_fee_per_pq_tx_near": 1e-05,
+        "node_egress_usd_month": 26.73,
+        "archive_growth_usd_month_added": 0.0,
+        "avg_reward_per_node_usd_month": 47250,
+        "node_extra_cost_usd_month_vs_baseline": 0.0,
+        "extra_cost_pct_of_avg_reward": 0.0
+      }
+    },
+    {
+      "scenario": "10% PQ transactions",
+      "user_pq": 0.1,
+      "validator_pq": false,
+      "perf": {
+        "avg_block_time_ms": 600.6,
+        "p99_block_time_ms": 600.0,
+        "blocks_stretched_pct": 0.75,
+        "throughput_tps": 1999.5,
+        "avg_inclusion_delay_blocks": 0.01,
+        "end_backlog_txs": 14,
+        "binding_constraint": "demand",
+        "bp_sig_verify_ms_per_block": 1.96
+      },
+      "bytes": {
+        "approvals_per_block_kb": 16.5,
+        "endorsements_per_block_kb": 15.8,
+        "block_kb": 37.5,
+        "avg_tx_bytes_per_block_kb": 962.3,
+        "avg_witness_per_block_kb": 12005.8,
+        "witness_p99_per_shard_mb": 1.63,
+        "node_egress_gb_day": 20.34,
+        "bp_burst_mb_per_block": 0.33,
+        "archive_growth_gb_day": 143.8,
+        "epoch_state_added_kb": 0.0
+      },
+      "econ": {
+        "pq_surcharge_burn_near_day": 173.45,
+        "user_extra_fee_per_pq_tx_near": 1e-05,
+        "node_egress_usd_month": 30.51,
+        "archive_growth_usd_month_added": 61.82,
+        "avg_reward_per_node_usd_month": 47250,
+        "node_extra_cost_usd_month_vs_baseline": 3.78,
+        "extra_cost_pct_of_avg_reward": 0.008
+      }
+    },
+    {
+      "scenario": "50% PQ transactions",
+      "user_pq": 0.5,
+      "validator_pq": false,
+      "perf": {
+        "avg_block_time_ms": 600.4,
+        "p99_block_time_ms": 600.0,
+        "blocks_stretched_pct": 0.7,
+        "throughput_tps": 1998.5,
+        "avg_inclusion_delay_blocks": 0.01,
+        "end_backlog_txs": 9,
+        "binding_constraint": "demand",
+        "bp_sig_verify_ms_per_block": 1.96
+      },
+      "bytes": {
+        "approvals_per_block_kb": 16.5,
+        "endorsements_per_block_kb": 15.8,
+        "block_kb": 37.5,
+        "avg_tx_bytes_per_block_kb": 3440.5,
+        "avg_witness_per_block_kb": 18201.2,
+        "witness_p99_per_shard_mb": 2.53,
+        "node_egress_gb_day": 30.33,
+        "bp_burst_mb_per_block": 0.33,
+        "archive_growth_gb_day": 500.5,
+        "epoch_state_added_kb": 0.0
+      },
+      "econ": {
+        "pq_surcharge_burn_near_day": 863.96,
+        "user_extra_fee_per_pq_tx_near": 1e-05,
+        "node_egress_usd_month": 45.5,
+        "archive_growth_usd_month_added": 307.95,
+        "avg_reward_per_node_usd_month": 47250,
+        "node_extra_cost_usd_month_vs_baseline": 18.77,
+        "extra_cost_pct_of_avg_reward": 0.04
+      }
+    },
+    {
+      "scenario": "100% PQ transactions",
+      "user_pq": 1.0,
+      "validator_pq": false,
+      "perf": {
+        "avg_block_time_ms": 600.9,
+        "p99_block_time_ms": 620.1,
+        "blocks_stretched_pct": 1.2,
+        "throughput_tps": 2000.5,
+        "avg_inclusion_delay_blocks": 0.02,
+        "end_backlog_txs": 0,
+        "binding_constraint": "demand",
+        "bp_sig_verify_ms_per_block": 1.96
+      },
+      "bytes": {
+        "approvals_per_block_kb": 16.5,
+        "endorsements_per_block_kb": 15.8,
+        "block_kb": 37.5,
+        "avg_tx_bytes_per_block_kb": 6548.3,
+        "avg_witness_per_block_kb": 25970.9,
+        "witness_p99_per_shard_mb": 3.56,
+        "node_egress_gb_day": 42.82,
+        "bp_burst_mb_per_block": 0.33,
+        "archive_growth_gb_day": 947.0,
+        "epoch_state_added_kb": 0.0
+      },
+      "econ": {
+        "pq_surcharge_burn_near_day": 1728.41,
+        "user_extra_fee_per_pq_tx_near": 1e-05,
+        "node_egress_usd_month": 64.24,
+        "archive_growth_usd_month_added": 616.03,
+        "avg_reward_per_node_usd_month": 47250,
+        "node_extra_cost_usd_month_vs_baseline": 37.51,
+        "extra_cost_pct_of_avg_reward": 0.079
+      }
+    },
+    {
+      "scenario": "validator keys PQ, classical txs",
+      "user_pq": 0.0,
+      "validator_pq": true,
+      "perf": {
+        "avg_block_time_ms": 643.6,
+        "p99_block_time_ms": 854.3,
+        "blocks_stretched_pct": 59.3,
+        "throughput_tps": 2001.7,
+        "avg_inclusion_delay_blocks": 0.2,
+        "end_backlog_txs": 174,
+        "binding_constraint": "gas",
+        "bp_sig_verify_ms_per_block": 4.9
+      },
+      "bytes": {
+        "approvals_per_block_kb": 827.8,
+        "endorsements_per_block_kb": 794.6,
+        "block_kb": 1627.6,
+        "avg_tx_bytes_per_block_kb": 364.3,
+        "avg_witness_per_block_kb": 10510.7,
+        "witness_p99_per_shard_mb": 1.33,
+        "node_egress_gb_day": 231.05,
+        "bp_burst_mb_per_block": 14.64,
+        "archive_growth_gb_day": 267.4,
+        "epoch_state_added_kb": 480.0
+      },
+      "econ": {
+        "pq_surcharge_burn_near_day": 0.0,
+        "user_extra_fee_per_pq_tx_near": 1e-05,
+        "node_egress_usd_month": 346.57,
+        "archive_growth_usd_month_added": 147.11,
+        "avg_reward_per_node_usd_month": 47250,
+        "node_extra_cost_usd_month_vs_baseline": 319.84,
+        "extra_cost_pct_of_avg_reward": 0.677
+      }
+    },
+    {
+      "scenario": "full PQ (txs + validators)",
+      "user_pq": 1.0,
+      "validator_pq": true,
+      "perf": {
+        "avg_block_time_ms": 665.0,
+        "p99_block_time_ms": 894.0,
+        "blocks_stretched_pct": 78.55,
+        "throughput_tps": 1967.6,
+        "avg_inclusion_delay_blocks": 16.8,
+        "end_backlog_txs": 43288,
+        "binding_constraint": "gas",
+        "bp_sig_verify_ms_per_block": 4.9
+      },
+      "bytes": {
+        "approvals_per_block_kb": 827.8,
+        "endorsements_per_block_kb": 794.6,
+        "block_kb": 1627.6,
+        "avg_tx_bytes_per_block_kb": 7127.8,
+        "avg_witness_per_block_kb": 27419.5,
+        "witness_p99_per_shard_mb": 3.69,
+        "node_egress_gb_day": 248.23,
+        "bp_burst_mb_per_block": 14.64,
+        "archive_growth_gb_day": 1137.6,
+        "epoch_state_added_kb": 480.0
+      },
+      "econ": {
+        "pq_surcharge_burn_near_day": 1700.02,
+        "user_extra_fee_per_pq_tx_near": 1e-05,
+        "node_egress_usd_month": 372.34,
+        "archive_growth_usd_month_added": 747.55,
+        "avg_reward_per_node_usd_month": 47250,
+        "node_extra_cost_usd_month_vs_baseline": 345.61,
+        "extra_cost_pct_of_avg_reward": 0.731
+      }
+    }
+  ],
+  "capacity": [
+    {
+      "mix": "mainnet mix",
+      "user_pq": 0.0,
+      "capacity_tps": 2227,
+      "bound": "gas",
+      "per_constraint_tps": {
+        "gas": 2227,
+        "tx-bytes": 98706,
+        "witness": 135337
+      }
+    },
+    {
+      "mix": "mainnet mix",
+      "user_pq": 0.1,
+      "capacity_tps": 2224,
+      "bound": "gas",
+      "per_constraint_tps": {
+        "gas": 2224,
+        "tx-bytes": 34962,
+        "witness": 47937
+      }
+    },
+    {
+      "mix": "mainnet mix",
+      "user_pq": 0.5,
+      "capacity_tps": 2209,
+      "bound": "gas",
+      "per_constraint_tps": {
+        "gas": 2209,
+        "tx-bytes": 9757,
+        "witness": 13378
+      }
+    },
+    {
+      "mix": "mainnet mix",
+      "user_pq": 1.0,
+      "capacity_tps": 2191,
+      "bound": "gas",
+      "per_constraint_tps": {
+        "gas": 2191,
+        "tx-bytes": 5132,
+        "witness": 7037
+      }
+    },
+    {
+      "mix": "minimal transfers",
+      "user_pq": 0.0,
+      "capacity_tps": 22274,
+      "bound": "gas",
+      "per_constraint_tps": {
+        "gas": 22274,
+        "tx-bytes": 98706,
+        "witness": 135337
+      }
+    },
+    {
+      "mix": "minimal transfers",
+      "user_pq": 1.0,
+      "capacity_tps": 5132,
+      "bound": "tx-bytes",
+      "per_constraint_tps": {
+        "gas": 19086,
+        "tx-bytes": 5132,
+        "witness": 7037
+      }
+    }
+  ]
+}
